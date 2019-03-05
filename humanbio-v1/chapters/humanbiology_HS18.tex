@@ -1,0 +1,301 @@
+	\documentclass[ 	%draft,
+				 %  	final,
+				 fontsize=10pt,%           Schriftgroesse
+				 paper=a4,%         Papier
+				 headinclude=true, footinclude=false, %kleinerer unterer Rand (footer nicht zum Textkoerper zaehlen)
+				 parskip=half-,%
+				 footsepline,headsepline, %
+				 mpinclude=true, % Randnotizen ermöglichen
+				 twoside%
+		 ]{skript-saz}
+%  \usepackage{etex}		 
+% \reserveinserts{64}
+\usepackage[maxfloats=36]{morefloats}  % adds another 18 floats
+ %
+\setboolean{@loesunganzeigen}{true}
+%	
+
+\newcommand{\Kommentar}[4]{\ifthenelse{\boolean{@loesunganzeigen}}{\bgroup\color{magenta}\ttfamily{#1}\egroup}
+		 { \ifthenelse{\equal{#4}{\empty}}{\def\breite{1\textwidth}}{\def\breite{#4}}
+			 \ifthenelse{\equal{#2}{\empty}}{}{\begin{tikzpicture}
+		        \draw[step=0.4cm,color=gray	,opacity=0.6] (0,0) grid (\breite,#2);    \end{tikzpicture}}%
+			\vspace{#3}}%
+			 }	%
+	  	\specialcomment{comment}{\begingroup\color{magenta}\ttfamily}{\endgroup}
+		\ifthenelse{\boolean{@loesunganzeigen}}{ }{\excludecomment{comment}}
+		
+
+% **********************************************************************************
+  %%% leider funktioniert li/re für ``caution`` nicht !!
+		%%% Befehle für die ``caution''' Umgegbung %%%
+		%\usepackage[dvipsnames]{xcolor}
+		\usepackage{ragged2e}
+		\usepackage{xparse}
+		%\usepackage[framemethod=tikz]{mdframed}
+		\usepackage{tikzpagenodes}
+		%\usepackage{lipsum}
+		\usepackage{ifoddpage}
+		\usepackage[fulladjust]{marginnote}
+		 \usepackage{vwcol} 
+
+		\newcounter{mycaution}
+		\newlength\trianglexshift
+		\newlength\boxhshift
+		\newlength\boxvshift
+		\newlength\noteheight
+		\newlength\uppertrianglecorner
+		\newcommand\side{}
+		\newcommand\boxanchor{}
+		\newcommand\otherside{}
+		\newcommand\pointeranchor{}
+
+		\newcommand\tikzmark[1]{%
+		  \tikz[remember picture,overlay]\node[inner xsep=0pt,outer sep=0pt] (#1) {};}
+
+		\NewDocumentCommand{\caution}{O{c}O{BrickRed}O{Caution!}m}{%
+		%
+		\checkoddpage
+% 		\ifoddpageoroneside
+		\ifoddpage
+		\setlength\trianglexshift{-3pt}
+		\setlength\boxhshift{-6\marginparsep}
+		\renewcommand{\side}{west}
+		\renewcommand{\otherside}{east}
+		\else
+		\setlength\trianglexshift{3pt}
+		\setlength\boxhshift{-1\marginparsep}
+		\renewcommand{\side}{east}%
+		\renewcommand{\otherside}{west}
+		\fi
+
+		\settoheight{\noteheight}{\parbox{\marginparwidth}{\RaggedRight\small#4}}
+		\stepcounter{mycaution}%
+		\tikzmark{\themycaution}%
+
+		\if#1b\relax
+		\renewcommand\pointeranchor{mybox\themycaution.south \side}%
+		\renewcommand\boxanchor{south \side}%
+		\setlength\boxvshift{\noteheight}%
+		\addtolength\boxvshift{0.7\baselineskip}
+		\setlength\uppertrianglecorner{13pt}%
+		\else
+		\if#1t\relax
+		\renewcommand\pointeranchor{mybox\themycaution.north \side}%
+		\renewcommand\boxanchor{north \side}%
+		\setlength\boxvshift{-\noteheight}%
+		\addtolength\boxvshift{1.3\baselineskip}
+		\setlength\uppertrianglecorner{-7pt}%
+		\else
+		\if#1c\relax
+		\renewcommand\pointeranchor{mybox\themycaution.\side}%
+		\renewcommand\boxanchor{\side}%
+		\setlength\boxvshift{\baselineskip}%
+		\setlength\uppertrianglecorner{3pt}%
+		\fi\fi\fi%
+
+		\begin{tikzpicture}[remember picture,overlay]
+		\node[draw=#2,anchor=\side,xshift=\boxhshift,yshift=\boxvshift]   
+		  (mybox\themycaution)
+		  at ([yshift=3pt]current page text area.\otherside|-\themycaution) 
+		  {\parbox{\marginparwidth}{\vskip10pt\RaggedRight\small#4}};
+		\node[fill=white,font=\color{#2}\sffamily,anchor=west,xshift=7pt]
+		  at (mybox\themycaution.north west) {\ #3\ };
+		\fill[#2]
+		  ([yshift=\uppertrianglecorner]\pointeranchor) --
+		  ([yshift=\uppertrianglecorner-3pt,xshift=\trianglexshift]\pointeranchor) --
+		  ([yshift=\uppertrianglecorner-6pt]\pointeranchor) -- cycle;
+		\end{tikzpicture}}
+		%% ************************************************************************
+	%% Befehl für mdframed boxen
+	% ***************************************
+	\usepackage{mdframed}
+		% MD-box mit grauem Hintergrund und gelbem Titelbalken
+			\mdfdefinestyle{exampledefault}{%
+			rightline=true,innerleftmargin=10,innerrightmargin=10,
+			frametitlerule=true,frametitlerulecolor=green,
+			frametitlebackgroundcolor=yellow, usetwoside=false,
+			frametitlerulewidth=2pt}	
+		% MD-box mit rotem, gerundetem Rand und gelbem Titelbalken	
+			\global\mdfdefinestyle{roundcorner}{%
+			outerlinewidth=5pt,innerlinewidth=0pt,align=center,
+			outerlinecolor=red,roundcorner=5pt}
+	%***********************************************************
+		
+% \newcommand{\fboxp}[2]{\begin{center}\fbox{\parbox{#1}{#2}}\end{center}}
+\usepackage[percent]{overpic}
+\input{glasswarelib.tex}
+\usepackage{marginnote}
+\usepackage{sidenotes}
+\usepackage{xparse}
+\usepackage{l3keys2e}
+\usepackage{changepage}
+\usepackage{fontawesome}
+\usepackage{chemfig}
+\renewcommand{\textrightarrow}{$\rightarrow$}
+  \renewcommand{\textleftarrow}{$\leftarrow$}
+
+%%Regentropfen:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+\pgfdeclareradialshading[droplet color]{droplet}{\pgfqpoint{-10bp}{-10bp}}{%
+ color(0bp)=(droplet color!50!white);
+ color(9bp)=(droplet color!75!white);
+ color(18bp)=(droplet color!85!black);
+ color(25bp)=(droplet color);
+ color(50bp)=(droplet color!50!white)}
+
+\colorlet{droplet color}{blue!50!cyan}
+\tikzset{%
+  raindrop/.pic={
+    code={\tikzset{scale=1/10}
+ \shade [shading=droplet]
+ (0,0)  .. controls ++(0,-1) and ++(0,1) .. (1,-2)
+ arc (360:180:1)
+ .. controls ++(0,1) and ++(0,-1) .. (0,0) -- cycle;
+  }}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%************************************************************************
+\usepackage{tocstyle}
+\usetocstyle{nopagecolumn}
+%%***************************************
+%% include films in your pdflatex
+% \usepackage{media9} %funktioniert leider nicht.... (29.12.15)
+
+%%
+%************  Präsentation  *********************************************
+% \usepackage[display]{texpower} \usepackage{pdfslide} 
+% 		\overlay{~/LaTex/presentations/background.png}
+	      \usepackage{hyperref}     \usepackage[printout]{texpower}  
+%%****************************************	   
+							\hypersetup{%
+							colorlinks=true, % Einfaerbung von Verknuepfungen
+							citecolor=brown,	% LitZitate blau anstatt grün 
+							linkcolor=blue,
+							pdfpagemode=UseThumbs, % Anzeige der Piktogramme
+							bookmarksopen=true,% Anzeige aller Ebenen
+							bookmarksnumbered=true, % Anzeige der Abschnittsnummern
+							breaklinks=true,	%links können umgebrochen werden
+							pdfstartpage={1} }
+%***************************************************************************
+\renewcommand*{\theHsection}{\thepart.\thesection}  % damit kann pro part die section-Nummerierung wieder bei 1 beginnen ( mit  \setcounter{section}{0})
+%
+\renewcommand*{\figureformat}{fig.~\thefigure\autodot}  
+\addto\extrasngerman{\def\figureautorefname{figure}}
+	\renewcommand*{\tableformat}{table~\thetable\autodot}
+	\addto\extrasngerman{\def\tableautorefname{table}}
+		 \chead{\ifthenelse{\boolean{@loesunganzeigen}}{\textcolor{red}{SOLUTION}}{}}
+		 \ihead{\leftmark}
+		 \ohead{anatomy and physiology}
+\ifthenelse{\boolean{@loesunganzeigen}}{\usepackage[phantomtext,dot,teachernotes]{dashundergaps}}{\usepackage[phantomtext,dot]{dashundergaps}}
+
+
+	\includeonly{ 
+% 		./Biology/hum00_anatomy/introduction_HS17,
+% 	anatomy_hs18,
+% 		   ./Biology/hum01_digestion_nutrition/digestion_HS18,
+% 		   ./Biology/met02_enzymes/enzymes-5-1_HS18,
+% % % % 		./Biology/hum00_anatomy/bones-skeleton_HS17,
+% 		   ./Biology/hum02_gaseous-exchange/vascularsystem-blood-HS18,
+% 		   ./Biology/hum11_immunobiology/immunity_HS18,
+% 			./Biology/hum02_gaseous-exchange/heart-circulation_HS18,
+		RespiratorySystem_HS18,
+% 		./Biology/hum14_homeostasis/homeostasis_HS18,
+% 		./Biology/hum05_hormones/EndocrineControl_HS18,
+		CellRespiration_HS18,
+		kidneys_HS18,
+% % % %		./Biology/hum02_gaseous-exchange/lung-Xrays-HS14
+			}%
+%
+%
+
+\begin{document}\label{BEGINDOKU}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 	 \setlength{\marginparwidth}{0.9\marginparwidth}  %KOMA: Randnotiz
+\zeitanzeigen=1
+% 	\ifthenelse{\boolean{@loesunganzeigen}}{\includecomment{comment} }{\excludecomment{comment}} %nötig hier?  - evtl. löschen
+\bibliographystyle{plainnat}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tolerance 1414
+\hbadness 1414
+\emergencystretch 1.5em
+\hfuzz 0.3pt
+\widowpenalty=10000
+\vfuzz \hfuzz
+\raggedbottom
+%%%%%%%%%%%%%%%%%%%%%
+	 \areaset[0cm]{14cm}{25cm}   % = breit
+\begin{center} \vspace{6cm}
+ {\fontfamily{pag} \fontseries{bx} \fontshape{sc} \fontsize{44pt}{50pt} \selectfont
+Human biology January -- April 2019}
+
+\vspace{2em}
+\textsl{We should all be very familiar with human biology - however, living in our body doesn't necessarily imply knowing how it works! It is the aim of this hand-out to teach you more about anatomy ("`what is where?"') and physiology ("`what works how?"') of the human body - our body. This may help you for a better understanding of what a physician ("`\textit{doctor}"') may explain to you after a visit - or to enable you, to ask him / her the right questions.}
+\end{center}
+
+\begin{flushright}
+	Kaspar A. Schwarzenbach\\
+	Bülach, August 2018
+\end{flushright}
+\vspace{2cm}
+% \begin{comment}
+% 		this file contains both solutions to various exercises and hints for didactics and planning
+%
+% 	feel free to print out parts of the document
+%
+% 	do not distribute this document without the author's consent
+% \end{comment}
+% \todol{wallpaper gestalten}
+% 		\ThisTileWallPaper{\paperwidth}{\paperheight}{erstelleBild}
+
+
+		\ThisTileWallPaper{1\paperwidth}{1\paperheight}{/share/00_SCHULE_DATA-add/bilder_saz/Humanbio_Bilder/Humanbio_Smith/Smith05_var04.png}
+		\thispagestyle{plain} % keine header/footer
+		\cleardoubleoddplainpage %nächste bedruckte Seite soll ungerade sei
+
+
+	%%%  INHALTSVERZEICHNIS  %%%
+		\pagenumbering{Roman}	% Römische Seitenzahlen
+		\thispagestyle{empty}
+		\clearpage
+		\tableofcontents
+		\cleardoublepage
+% 		\addtocounter{page}{-1}	
+% 		\fillwithdottedlines{\stretch{1}}
+	%%%%%%%%%%%%%%%%%%%
+	 \areaset[0cm]{11.5cm}{27.4cm}   % = default; kann geändert werden
+		\pagenumbering{arabic}
+\include{./Biology/hum00_anatomy/introduction_HS17}
+\clearpage
+\include{anatomy_hs18}
+% % \include{./Biology/hum00_anatomy/bones-skeleton_HS17} %skipped in HS18
+% \clearpage
+\include{./Biology/hum01_digestion_nutrition/digestion_HS18}
+\include{./Biology/met02_enzymes/enzymes-5-1_HS18}
+\cleardoublepage
+\include{./Biology/hum02_gaseous-exchange/vascularsystem-blood-HS18}
+	\cleardoublepage
+\include{./Biology/hum11_immunobiology/immunity_HS18}
+\include{./Biology/hum02_gaseous-exchange/heart-circulation_HS18}
+\cleardoubleoddstandardpage
+\include{RespiratorySystem_HS18}
+\cleardoubleoddstandardpage
+\include{./Biology/hum14_homeostasis/homeostasis_HS18}
+\cleardoubleoddstandardpage
+\include{./Biology/hum05_hormones/EndocrineControl_HS18}
+\cleardoubleoddstandardpage
+\include{CellRespiration_HS18}
+\cleardoubleoddstandardpage
+\include{kidneys_HS18}
+
+		\include{./Biology/hum02_gaseous-exchange/lung-Xrays-HS14}
+
+
+\Loesung{
+	\listoffigures
+	\listoftables
+	%\nobibliography
+	%\bibliography{Lit_bio_saz}   % unbedingt: run(pdflatex) dann run(bibtex)) dann run(pdflatex)
+	%\theendnotes        %%gibt Probleme mit svn oder sowas (ev. packet neu installieren)
+	}{0cm}
+\end{document} 
+
+%
